@@ -1,0 +1,5 @@
+{
+  "name": "RAG & REX Explorer",
+  "description": "Une application interactive pour comprendre et visualiser le Retrieval-Augmented Generation (RAG) et le Retrieval-Enhanced Explanation (REX) via l'API Gemini.",
+  "requestFramePermissions": []
+}
