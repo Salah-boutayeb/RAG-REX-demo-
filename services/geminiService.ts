@@ -2,7 +2,16 @@ import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { KnowledgeChunk, RetrievalResult } from "../types";
 
 // Initialize Gemini Client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAI = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.warn("GEMINI_API_KEY is missing. Please set it in your environment variables.");
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
+
+const ai = getAI();
 
 const MODEL_NAME = "gemini-2.5-flash";
 
@@ -16,6 +25,9 @@ export const performRetrieval = async (
   chunks: KnowledgeChunk[]
 ): Promise<RetrievalResult[]> => {
   if (!chunks.length) return [];
+  if (!ai) {
+    return chunks.map(c => ({ chunkId: c.id, score: 0, reasoning: "API Key missing - check environment variables." }));
+  }
 
   const chunksText = chunks.map((c, i) => `ID: ${c.id}\nContent: "${c.content}"`).join("\n---\n");
 
@@ -77,6 +89,9 @@ export const generateAnswer = async (
   query: string,
   relevantChunks: KnowledgeChunk[]
 ): Promise<string> => {
+  if (!ai) {
+    return "L'API Gemini n'est pas configurée. Veuillez ajouter votre GEMINI_API_KEY dans les variables d'environnement de Vercel.";
+  }
   const context = relevantChunks.map(c => c.content).join("\n\n");
 
   const prompt = `
